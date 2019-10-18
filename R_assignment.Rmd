@@ -176,17 +176,30 @@ ggplot(data = fang_snp, aes(x = as.numeric(Position))) + geom_density(aes(fill =
 # Missing Data and amount of heterozygosity:
 # Melting
 fang_et_al_genotypes <- data.frame(read_tsv("./fang_et_al_genotypes.txt"))
-fang <- fang_et_al_genotypes %>% select(-(JG_OTU:Group))
-fang <- as.data.frame(t(fang), stringsAsFactors = FALSE)
-
 melted <- melt(data = fang_et_al_genotypes, id.var = "Sample_ID", measure.var = names(fang_et_al_genotypes[4:986]))
 fang_melt <- melted %>% as.matrix()
 homo <- replace(fang_melt, fang_melt %in% c("A/A", "T/T", "C/C", "G/G"), "Homozygous")
 hetero <- replace(homo, homo %in% c("A/T", "A/C", "A/G", "T/A", "T/C", "T/G", "C/A", "C/G", "C/T", "G/A", "G/C", "G/T"), "Heterozygous")
-final_melt <- as.data.frame(replace(hetero, hetero == "?/?", "unknown"))
+final <- as.data.frame(replace(hetero, hetero %in% c("?/?", "?/A", "A/?", "T/?", "?/T", "C/?", "?/C", "G/?", "?/G"), "unknown"))
 
-ggplot(data = final_melt) + geom_bar(mapping = aes(x = value), color = "blue", fill = "blue")
+ggplot(data = final) + geom_bar(mapping = aes(x = value), color = "blue", fill = "blue")
+```
 
-#My own Graph
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+# My own Graph
+fang_et_al_genotypes <- data.frame(read_tsv("./fang_et_al_genotypes.txt"))
+melted <- melt(data = fang_et_al_genotypes, id.var = "Sample_ID", measure.var = names(fang_et_al_genotypes[4:986]))
+fang_melt <- melted %>% as.matrix()
+
+A <- replace(fang_melt, fang_melt %in% c("A/A","A/T", "A/G", "A/C"), "A")
+C <- replace(A, A %in% c("C/C", "C/A", "C/T", "C/G"), "C")
+G <- replace(C, C %in% c("G/G", "G/A", "G/T", "G/C"), "G")
+TT <- replace(G, G %in% c("T/T", "T/A", "T/G", "T/C"), "T")
+
+base <- as.data.frame(TT)
+ggplot(data = base) + geom_bar(mapping = aes(x = value), color = "blue", fill = "purple")
 
 ```
