@@ -15,18 +15,41 @@ This is an R Markdown document. Markdown is a simple formatting syntax for autho
 
 When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 
-Data Inspection:
-
-Data Processing:
-
-```{r cars}
+Install the necessary packages:
+```{r}
+if (!require("tidyverse")) install.packages("tidyverse")
 library(tidyverse)
+if (!require("dplyr")) install.packages("dplyr")
 library(dplyr)
+if (!require("ggplot2")) install.packages("ggplot2")
+library(ggplot2)
+```
 
+
+
+Data Inspection:
+After inspecting the files I learned:
+- The fang_et_al_genotypes.txt file is of size 11,051,939 bytes. It has 986 columns and 2782 rows.
+- The snp_position.txt file is of size 82,763 bytes. It has 15 columns and 983 rows.
+
+```{r}
 # Reading in the Data
 fang_et_al_genotypes <- data.frame(read_tsv("./fang_et_al_genotypes.txt"))
 snp_position <- data.frame(read_tsv("./snp_position.txt"))
 
+file.info("./fang_et_al_genotypes.txt", extra_cols = TRUE)
+file.info("./snp_position.txt", extra_cols = TRUE)
+
+ncol(fang_et_al_genotypes)
+nrow(fang_et_al_genotypes)
+ncol(snp_position)
+nrow(snp_position)
+```
+
+#Part I: 
+#Data Processing:
+
+```{r cars}
 # Extracting Maize and Teosinte Groups
 maize <- filter(fang_et_al_genotypes, Group == "ZMMIL" | Group == "ZMMLR" | Group == "ZMMMR")
 teosinte <- filter(fang_et_al_genotypes, Group == "ZMPBA" | Group == "ZMPIL" | Group == "ZMPJA")
@@ -47,57 +70,70 @@ maize_join <- cbind(snp_position, transposed_maize)
 teosinte_join <- cbind(snp_position, transposed_teosinte)
 rownames(maize_join) <- NULL
 rownames(teosinte_join) <- NULL
+```
 
+
+
+```{r}
 # Sorting by increasing Position
-sort_maize <- arrange(maize_join, as.numeric(Position))
-sort_teosinte <- arrange(teosinte_join, as.numeric(Position))
+#sort_maize <- arrange(maize_join, as.numeric(Position))
+#sort_teosinte <- arrange(teosinte_join, as.numeric(Position))
 
-# Extract Info by Chromosome
-chrom_1_maize_Inc <- filter(sort_maize, Chromosome == 1)
-chrom_2_maize_Inc <- filter(sort_maize, Chromosome == 2)
-chrom_3_maize_Inc <- filter(sort_maize, Chromosome == 3)
-chrom_4_maize_Inc <- filter(sort_maize, Chromosome == 4)
-chrom_5_maize_Inc <- filter(sort_maize, Chromosome == 5)
-chrom_6_maize_Inc <- filter(sort_maize, Chromosome == 6)
-chrom_7_maize_Inc <- filter(sort_maize, Chromosome == 7)
-chrom_8_maize_Inc <- filter(sort_maize, Chromosome == 8)
-chrom_9_maize_Inc <- filter(sort_maize, Chromosome == 9)
-chrom_10_maize_Inc <- filter(sort_maize, Chromosome == 10)
+dir.create("Maize")
+dir.create("./Maize/Increasing")
+dir.create("./Maize/Decreasing")
+dir.create("Teosinte")
+dir.create("./Teosinte/Increasing")
+dir.create("./Teosinte/Decreasing")
 
-write_csv(chrom_1_maize_Inc, "Chromosome1_Maize_Increasing")
-write_csv(chrom_2_maize_Inc, "Chromosome2_Maize_Increasing")
-write_csv(chrom_3_maize_Inc, "Chromosome3_Maize_Increasing")
-write_csv(chrom_4_maize_Inc, "Chromosome4_Maize_Increasing")
-write_csv(chrom_5_maize_Inc, "Chromosome5_Maize_Increasing")
-write_csv(chrom_6_maize_Inc, "Chromosome6_Maize_Increasing")
-write_csv(chrom_7_maize_Inc, "Chromosome7_Maize_Increasing")
-write_csv(chrom_8_maize_Inc, "Chromosome8_Maize_Increasing")
-write_csv(chrom_9_maize_Inc, "Chromosome9_Maize_Increasing")
-write_csv(chrom_10_maize_Inc, "Chromosome10_Maize_Increasing")
+## Extract Info by Chromosome ##
+# Maize
+maize_join %>% filter(Chromosome == 1) %>% arrange(as.numeric(Position)) %>% write_tsv("./Maize/Increasing/Maize_Chrom1_Inc.txt")
 
-chrom_1_teosinte_Inc <- filter(sort_teosinte, Chromosome == 1)
-chrom_2_teosinte_Inc <- filter(sort_teosinte, Chromosome == 2)
-chrom_3_teosinte_Inc <- filter(sort_teosinte, Chromosome == 3)
-chrom_4_teosinte_Inc <- filter(sort_teosinte, Chromosome == 4)
-chrom_5_teosinte_Inc <- filter(sort_teosinte, Chromosome == 5)
-chrom_6_teosinte_Inc <- filter(sort_teosinte, Chromosome == 6)
-chrom_7_teosinte_Inc <- filter(sort_teosinte, Chromosome == 7)
-chrom_8_teosinte_Inc <- filter(sort_teosinte, Chromosome == 8)
-chrom_9_teosinte_Inc <- filter(sort_teosinte, Chromosome == 9)
-chrom_10_teosinte_Inc <- filter(sort_teosinte, Chromosome == 10)
+maize_join %>% filter(Chromosome == 2) %>% arrange(as.numeric(Position)) %>% write_tsv("./Maize/Increasing/Maize_Chrom2_Inc.txt")
 
-write_csv(chrom_1_teosinte_Inc, "Chromosome1_Teosinte_Increasing")
-write_csv(chrom_2_teosinte_Inc, "Chromosome2_Teosinte_Increasing")
-write_csv(chrom_3_teosinte_Inc, "Chromosome3_Teosinte_Increasing")
-write_csv(chrom_4_teosinte_Inc, "Chromosome4_Teosinte_Increasing")
-write_csv(chrom_5_teosinte_Inc, "Chromosome5_Teosinte_Increasing")
-write_csv(chrom_6_teosinte_Inc, "Chromosome6_Teosinte_Increasing")
-write_csv(chrom_7_teosinte_Inc, "Chromosome7_Teosinte_Increasing")
-write_csv(chrom_8_teosinte_Inc, "Chromosome8_Teosinte_Increasing")
-write_csv(chrom_9_teosinte_Inc, "Chromosome9_Teosinte_Increasing")
-write_csv(chrom_10_teosinte_Inc, "Chromosome10_Teosinte_Increasing")
+maize_join %>% filter(Chromosome == 3) %>% arrange(as.numeric(Position)) %>% write_tsv("./Maize/Increasing/Maize_Chrom3_Inc.txt")
+
+maize_join %>% filter(Chromosome == 4) %>% arrange(as.numeric(Position)) %>% write_tsv("./Maize/Increasing/Maize_Chrom4_Inc.txt")
+
+maize_join %>% filter(Chromosome == 5) %>% arrange(as.numeric(Position)) %>% write_tsv("./Maize/Increasing/Maize_Chrom5_Inc.txt")
+
+maize_join %>% filter(Chromosome == 6) %>% arrange(as.numeric(Position)) %>% write_tsv("./Maize/Increasing/Maize_Chrom6_Inc.txt")
+
+maize_join %>% filter(Chromosome == 7) %>% arrange(as.numeric(Position)) %>% write_tsv("./Maize/Increasing/Maize_Chrom7_Inc.txt")
+
+maize_join %>% filter(Chromosome == 8) %>% arrange(as.numeric(Position)) %>% write_tsv("./Maize/Increasing/Maize_Chrom8_Inc.txt")
+
+maize_join %>% filter(Chromosome == 9) %>% arrange(as.numeric(Position)) %>% write_tsv("./Maize/Increasing/Maize_Chrom9_Inc.txt")
+
+maize_join %>% filter(Chromosome == 10) %>% arrange(as.numeric(Position)) %>% write_tsv("./Maize/Increasing/Maize_Chrom10_Inc.txt")
 
 
+# Teosinte
+teosinte_join %>% filter(Chromosome == 1) %>% arrange(as.numeric(Position)) %>% write_tsv("./Teosinte/Increasing/Teosinte_Chrom1_Inc.txt")
+
+teosinte_join %>% filter(Chromosome == 2) %>% arrange(as.numeric(Position)) %>% write_tsv("./Teosinte/Increasing/Teosinte_Chrom2_Inc.txt")
+
+teosinte_join %>% filter(Chromosome == 3) %>% arrange(as.numeric(Position)) %>% write_tsv("./Teosinte/Increasing/Teosinte_Chrom3_Inc.txt")
+
+teosinte_join %>% filter(Chromosome == 4) %>% arrange(as.numeric(Position)) %>% write_tsv("./Teosinte/Increasing/Teosinte_Chrom4_Inc.txt")
+
+teosinte_join %>% filter(Chromosome == 5) %>% arrange(as.numeric(Position)) %>% write_tsv("./Teosinte/Increasing/Teosinte_Chrom5_Inc.txt")
+
+teosinte_join %>% filter(Chromosome == 6) %>% arrange(as.numeric(Position)) %>% write_tsv("./Teosinte/Increasing/Teosinte_Chrom6_Inc.txt")
+
+teosinte_join %>% filter(Chromosome == 7) %>% arrange(as.numeric(Position)) %>% write_tsv("./Teosinte/Increasing/Teosinte_Chrom7_Inc.txt")
+
+teosinte_join %>% filter(Chromosome == 8) %>% arrange(as.numeric(Position)) %>% write_tsv("./Teosinte/Increasing/Teosinte_Chrom8_Inc.txt")
+
+teosinte_join %>% filter(Chromosome == 9) %>% arrange(as.numeric(Position)) %>% write_tsv("./Teosinte/Increasing/Teosinte_Chrom9_Inc.txt")
+
+teosinte_join %>% filter(Chromosome == 10) %>% arrange(as.numeric(Position)) %>% write_tsv("./Teosinte/Increasing/Teosinte_Chrom10_Inc.txt")
+
+```
+
+
+```{r}
 # Sort by Decreasing Position
 sort_maize_dec <- arrange(maize_join, desc(as.numeric(Position)))
 sort_teosinte_dec <- arrange(teosinte_join, desc(as.numeric(Position)))
@@ -107,88 +143,96 @@ maize_dec <- as.data.frame(lapply(sort_maize_dec, gsub, pattern = "?", replaceme
 teosinte_dec <- as.data.frame(lapply(sort_teosinte_dec, gsub, pattern = "?", replacement = "-", fixed = TRUE))
 
 # Extract Info by Chromosome
-chrom_1_maize_Dec <- filter(maize_dec, Chromosome == 1)
-chrom_2_maize_Dec <- filter(maize_dec, Chromosome == 2)
-chrom_3_maize_Dec <- filter(maize_dec, Chromosome == 3)
-chrom_4_maize_Dec <- filter(maize_dec, Chromosome == 4)
-chrom_5_maize_Dec <- filter(maize_dec, Chromosome == 5)
-chrom_6_maize_Dec <- filter(maize_dec, Chromosome == 6)
-chrom_7_maize_Dec <- filter(maize_dec, Chromosome == 7)
-chrom_8_maize_Dec<- filter(maize_dec, Chromosome == 8)
-chrom_9_maize_Dec <- filter(maize_dec, Chromosome == 9)
-chrom_10_maize_Dec <- filter(maize_dec, Chromosome == 10)
+# Maize
+maize_dec %>% filter(Chromosome == 1) %>% write_tsv("./Maize/Decreasing/Maize_Chrom1_Dec.txt")
+maize_dec %>% filter(Chromosome == 2) %>% write_tsv("./Maize/Decreasing/Maize_Chrom2_Dec.txt")
+maize_dec %>% filter(Chromosome == 3) %>% write_tsv("./Maize/Decreasing/Maize_Chrom3_Dec.txt")
+maize_dec %>% filter(Chromosome == 4) %>% write_tsv("./Maize/Decreasing/Maize_Chrom4_Dec.txt")
+maize_dec %>% filter(Chromosome == 5) %>% write_tsv("./Maize/Decreasing/Maize_Chrom5_Dec.txt")
+maize_dec %>% filter(Chromosome == 6) %>% write_tsv("./Maize/Decreasing/Maize_Chrom6_Dec.txt")
+maize_dec %>% filter(Chromosome == 7) %>% write_tsv("./Maize/Decreasing/Maize_Chrom7_Dec.txt")
+maize_dec %>% filter(Chromosome == 8) %>% write_tsv("./Maize/Decreasing/Maize_Chrom8_Dec.txt")
+maize_dec %>% filter(Chromosome == 9) %>% write_tsv("./Maize/Decreasing/Maize_Chrom9_Dec.txt")
+maize_dec %>% filter(Chromosome == 10) %>% write_tsv("./Maize/Decreasing/Maize_Chrom10_Dec.txt")
 
-write_csv(chrom_1_maize_Dec, "Chromosome1_Maize_Decreasing")
-write_csv(chrom_2_maize_Dec, "Chromosome2_Maize_Decreasing")
-write_csv(chrom_3_maize_Dec, "Chromosome3_Maize_Decreasing")
-write_csv(chrom_4_maize_Dec, "Chromosome4_Maize_Decreasing")
-write_csv(chrom_5_maize_Dec, "Chromosome5_Maize_Decreasing")
-write_csv(chrom_6_maize_Dec, "Chromosome6_Maize_Decreasing")
-write_csv(chrom_7_maize_Dec, "Chromosome7_Maize_Decreasing")
-write_csv(chrom_8_maize_Dec, "Chromosome8_Maize_Decreasing")
-write_csv(chrom_9_maize_Dec, "Chromosome9_Maize_Decreasing")
-write_csv(chrom_10_maize_Dec, "Chromosome10_Maize_Decreasing")
-
-chrom_1_teosinte_Dec <- filter(teosinte_dec, Chromosome == 1)
-chrom_2_teosinte_Dec <- filter(teosinte_dec, Chromosome == 2)
-chrom_3_teosinte_Dec <- filter(teosinte_dec, Chromosome == 3)
-chrom_4_teosinte_Dec <- filter(teosinte_dec, Chromosome == 4)
-chrom_5_teosinte_Dec <- filter(teosinte_dec, Chromosome == 5)
-chrom_6_teosinte_Dec <- filter(teosinte_dec, Chromosome == 6)
-chrom_7_teosinte_Dec <- filter(teosinte_dec, Chromosome == 7)
-chrom_8_teosinte_Dec<- filter(teosinte_dec, Chromosome == 8)
-chrom_9_teosinte_Dec <- filter(teosinte_dec, Chromosome == 9)
-chrom_10_teosinte_Dec <- filter(teosinte_dec, Chromosome == 10)
-
-write_csv(chrom_1_teosinte_Dec, "Chromosome1_Teosinte_Decreasing")
-write_csv(chrom_2_teosinte_Dec, "Chromosome2_Teosinte_Decreasing")
-write_csv(chrom_3_teosinte_Dec, "Chromosome3_Teosinte_Decreasing")
-write_csv(chrom_4_teosinte_Dec, "Chromosome4_Teosinte_Decreasing")
-write_csv(chrom_5_teosinte_Dec, "Chromosome5_Teosinte_Decreasing")
-write_csv(chrom_6_teosinte_Dec, "Chromosome6_Teosinte_Decreasing")
-write_csv(chrom_7_teosinte_Dec, "Chromosome7_Teosinte_Decreasing")
-write_csv(chrom_8_teosinte_Dec, "Chromosome8_Teosinte_Decreasing")
-write_csv(chrom_9_teosinte_Dec, "Chromosome9_Teosinte_Decreasing")
-write_csv(chrom_10_teosinte_Dec, "Chromosome10_Teosinte_Decreasing")
-
+# Teosinte
+teosinte_dec %>% filter(Chromosome == 1) %>% write_tsv("./Teosinte/Decreasing/Teosinte_Chrom1_Dec.txt")
+teosinte_dec %>% filter(Chromosome == 2) %>% write_tsv("./Teosinte/Decreasing/Teosinte_Chrom2_Dec.txt")
+teosinte_dec%>% filter(Chromosome == 3) %>% write_tsv("./Teosinte/Decreasing/Teosinte_Chrom3_Dec.txt")
+teosinte_dec %>% filter(Chromosome == 4) %>% write_tsv("./Teosinte/Decreasing/Teosinte_Chrom4_Dec.txt")
+teosinte_dec %>% filter(Chromosome == 5) %>% write_tsv("./Teosinte/Decreasing/Teosinte_Chrom5_Dec.txt")
+teosinte_dec %>% filter(Chromosome == 6) %>% write_tsv("./Teosinte/Decreasing/Teosinte_Chrom6_Dec.txt")
+teosinte_dec %>% filter(Chromosome == 7) %>% write_tsv("./Teosinte/Decreasing/Teosinte_Chrom7_Dec.txt")
+teosinte_dec %>% filter(Chromosome == 8) %>% write_tsv("./Teosinte/Decreasing/Teosinte_Chrom8_Dec.txt")
+teosinte_dec %>% filter(Chromosome == 9) %>% write_tsv("./Teosinte/Decreasing/Teosinte_Chrom9_Dec.txt")
+teosinte_dec %>% filter(Chromosome == 10) %>% write_tsv("./Teosinte/Decreasing/Teosinte_Chrom10_Dec.txt")
 ```
+
+
 # Part II
 ```{r}
 library(reshape2)
-library(tidyverse)
-library(ggplot2)
-fang_et_al_genotypes <- data.frame(read_tsv("./fang_et_al_genotypes.txt"))
-snp_position <- data.frame(read_tsv("./snp_position.txt"))
 
 fang <- fang_et_al_genotypes %>% select(-(Sample_ID:Group))
 snp <- snp_position %>% select(SNP_ID, Chromosome, Position)
 fang <- as.data.frame(t(fang), stringsAsFactors = FALSE)
 
-#fang_snp <- merge(snp, fang)
 fang_snp <- cbind(snp,fang)
 
-#SNPs per Chromosome:Total # of SNPs in dataset/chromosome. Distribution of SNPS on chromosomes
+theme_update(plot.title = element_text(hjust = 0.5))
 
-ggplot(data = fang_snp) + geom_bar(mapping = aes(x = as.numeric(Chromosome)), color = "blue", fill = "blue")
+#SNPs per Chromosome:Total # of SNPs in dataset/chromosome.
+ggplot(data = fang_snp) + geom_bar(mapping = aes(x = as.numeric(Chromosome)), color = "blue", fill = "blue") + ggtitle("SNPs Per Chromosome") + labs(y="Count", x = "Chromosome")
 
-ggplot(data = fang_snp, aes(x = as.numeric(Position))) + geom_density(aes(fill = as.character(Chromosome))) + facet_wrap(~as.character(Chromosome)) + theme_light()
 
+# Distribution of SNPS on chromosomes
+ggplot(data = fang_snp, aes(x = as.numeric(Position))) + geom_density(aes(fill = as.character(Chromosome))) + labs(x = "Position", fill = "Chromosome") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5)) + ggtitle("SNP Distribution Per Chromosome") + facet_wrap(~as.character(Chromosome)) + theme_light() 
+```
+```{r}
 # Missing Data and amount of heterozygosity:
 # Melting
-fang_et_al_genotypes <- data.frame(read_tsv("./fang_et_al_genotypes.txt"))
 melted <- melt(data = fang_et_al_genotypes, id.var = "Sample_ID", measure.var = names(fang_et_al_genotypes[4:986]))
 fang_melt <- melted %>% as.matrix()
 homo <- replace(fang_melt, fang_melt %in% c("A/A", "T/T", "C/C", "G/G"), "Homozygous")
 hetero <- replace(homo, homo %in% c("A/T", "A/C", "A/G", "T/A", "T/C", "T/G", "C/A", "C/G", "C/T", "G/A", "G/C", "G/T"), "Heterozygous")
 final <- as.data.frame(replace(hetero, hetero %in% c("?/?", "?/A", "A/?", "T/?", "?/T", "C/?", "?/C", "G/?", "?/G"), "unknown"))
 
-ggplot(data = final) + geom_bar(mapping = aes(x = value), color = "blue", fill = "blue")
+ggplot(data = final) + geom_bar(mapping = aes(x = value), color = "blue", fill = "blue") + ggtitle("Amount of Heterozygosity") + labs(x = "Heterozygosity")
 ```
 
 
 ```{r}
-library(tidyverse)
-library(ggplot2)
+fang_et_al_genotypes <- data.frame(read_tsv("./fang_et_al_genotypes.txt"))
+
+genotypes <- fang_et_al_genotypes %>%
+    mutate_if(is.character, str_replace_all, pattern = "A/A", replacement = "Homozygous") %>%
+    mutate_if(is.character, str_replace_all, pattern = "T/T", replacement = "Homozygous") %>%
+    mutate_if(is.character, str_replace_all, pattern = "C/C", replacement = "Homozygous") %>%
+    mutate_if(is.character, str_replace_all, pattern = "G/G", replacement = "Homozygous") %>%
+    mutate_if(is.character, str_replace_all, pattern = "A/T", replacement = "Heterozygous") %>%
+  mutate_if(is.character, str_replace_all, pattern = "A/G", replacement = "Heterozygous") %>%
+  mutate_if(is.character, str_replace_all, pattern = "A/C", replacement = "Heterozygous") %>%
+  mutate_if(is.character, str_replace_all, pattern = "T/A", replacement = "Heterozygous") %>%
+  mutate_if(is.character, str_replace_all, pattern = "T/G", replacement = "Heterozygous") %>%
+  mutate_if(is.character, str_replace_all, pattern = "T/C", replacement = "Heterozygous") %>%
+  mutate_if(is.character, str_replace_all, pattern = "G/A", replacement = "Heterozygous") %>%
+  mutate_if(is.character, str_replace_all, pattern = "G/T", replacement = "Heterozygous") %>%
+  mutate_if(is.character, str_replace_all, pattern = "G/C", replacement = "Heterozygous") %>%
+  mutate_if(is.character, str_replace_all, pattern = "C/A", replacement = "Heterozygous") %>%
+  mutate_if(is.character, str_replace_all, pattern = "C/T", replacement = "Heterozygous") %>%
+  mutate_if(is.character, str_replace_all, pattern = "C/G", replacement = "Heterozygous") %>%
+  mutate_if(is.character, str_replace_all, pattern = "\\?\\/?", replacement = "Missing")
+
+group <- melt(data = genotypes, id.var = "Group", measure.var = names(fang_et_al_genotypes[4:986]))
+
+x <- ggplot(data = group) + geom_bar(mapping = aes(x = Group, fill = value)) + theme(axis.text.x = element_text(angle = 90, vjust = 0.5)) + ggtitle("Heterozygosity Per Group")
+
+x + labs(fill = "Heterozygosity")
+```
+
+
+
+```{r}
 # My own Graph
 fang_et_al_genotypes <- data.frame(read_tsv("./fang_et_al_genotypes.txt"))
 melted <- melt(data = fang_et_al_genotypes, id.var = "Sample_ID", measure.var = names(fang_et_al_genotypes[4:986]))
@@ -200,6 +244,7 @@ G <- replace(C, C %in% c("G/G", "G/A", "G/T", "G/C"), "G")
 TT <- replace(G, G %in% c("T/T", "T/A", "T/G", "T/C"), "T")
 
 base <- as.data.frame(TT)
-ggplot(data = base) + geom_bar(mapping = aes(x = value), color = "blue", fill = "purple")
+ggplot(data = base) + geom_bar(mapping = aes(x = value), color = "blue", fill = "purple") + ggtitle("Amount of A,T,C &G's on First Gene") + labs(x = "Nucleotides")
 
 ```
+
