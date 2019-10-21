@@ -1,0 +1,19 @@
+# Part 1: Data inspection is missing:
+Commands you can use for data inspection:
+file.info()
+head()
+tail()
+str()
+colnomes()
+rownames()
+
+# Part 2: Data visualization
+You could automate the generation of files for maize and teosinte by using for loop for example:
+for(thisName in allNames[c(1:10)]){
+  splitData[[thisName]] <- splitData[[thisName]][order(as.numeric(as.character(splitData[[thisName]]$Position))),]
+  saveName = paste0("teosinte_", thisName, '.txt')
+  write.table(splitData[[thisName]], file = saveName, sep = "\t", row.names = FALSE)
+}
+
+Rest looks good! Good Job!
+ 
